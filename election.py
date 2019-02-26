@@ -16,7 +16,8 @@ import secrets
 import threading
 
 from client import VoterClient
-from server import ElectionServer, HOSTNAME as server_hostname, PORT as server_port
+from server import ElectionServer, HOSTNAME as server_hostname, \
+    PORT as server_port
 
 
 def main():
@@ -48,9 +49,16 @@ def main():
         voter2["id"]: vote_crypto.client2["public_key"]
     }
 
+    # define voter random token registry: mapping of voter ids to their tokens
+    # for _this_ election only (known by election service)
+    voter_tokens = {
+        voter1["id"]: voter1["token"],
+        voter2["id"]: voter2["token"]
+    }
+
     # instantiate election server and voter clients
     election_server = ElectionServer(
-        vote_crypto.server["private_key"], voter_registry,
+        vote_crypto.server["private_key"], voter_registry, voter_tokens,
         num_votes_until_quit=2)
     voter_client1 = VoterClient(
         vote_crypto.client1["private_key"], voter1["id"], voter1["token"],
